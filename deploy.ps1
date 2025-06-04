@@ -6,7 +6,9 @@ param (
   [string]$Environment,
 
   [Parameter(Mandatory = $false, HelpMessage = "Path to API files to deploy")]
-  [string]$ApiLocation = $null
+  [string]$ApiLocation = $null,
+  [Parameter(Mandatory = $false, HelpMessage = "Directory that contains the staticwebapp.config.json file")]
+  [string]$ConfigDirectory = $null
 )
 
 BEGIN {
@@ -37,7 +39,15 @@ BEGIN {
   }
 
   if ($ApiLocation) {
-    $cliParameters.api_location = $ApiLocation
+    $cliParameters["api-location"] = $ApiLocation
+  }
+
+  if ($ConfigDirectory) {
+    if (-not (Test-Path $ConfigDirectory)) {
+      Write-Host "::error title=Config Directory not found::The specified config directory '$ConfigDirectory' does not exist."
+      exit 1
+    }
+    $cliParameters["swa-config-location"] = $ConfigDirectory
   }
 
   # Convert parameters to a format suitable for the swa command

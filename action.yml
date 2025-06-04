@@ -38,6 +38,10 @@ inputs:
     description: The environment to deploy to.
     required: false
     default: 'production'
+  swa_config_directory:
+    description: The directory where the staticwebapp.config.json file is, relative to the root of the repository
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -91,4 +95,5 @@ runs:
           -AppLocation '${{ inputs.app_location }}' `
           -Environment '${{ inputs.swa_environment }}' `
           -ApiLocation '${{ inputs.api_location }}' `
+          -ConfigDirectory '${{ inputs.swa_config_directory }}' `
 
