@@ -76,14 +76,27 @@ BEGIN {
     if ($swaOutput -match "Project deployed to (https?://[^\s]+)") {
       $url = $matches[1]
       Write-Host "✅ Deployment URL: $url"
+      Add-Content -Path $env:GITHUB_OUTPUT -Value "deployment_url=$url"
       Write-Host "::set-output name=deployment-url::$url"
       Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "## Static web app deployment`n`n✅ Deployment URL: [$url]($url)`n"
     } else {
-      Write-Host "❔ Deployment URL not found, output did not capture everything.-----------------------------"
-      Write-Host $swaOutput
-      Write-Host "❔ Deployment URL not found, output did not capture everything.-----------------------------"
+      try {
+        $info = Invoke-RestMethod -Uri "https://content-am2.infrastructure.6.azurestaticapps.net/api/upload/validateapitoken?apiVersion=v1&deploymentCorrelationId=$(New-Guid)" `
+          -Method Post -ErrorAction SilentlyContinue `
+          -UserAgent "staticsites-swacli-client" `
+          -ContentType "application/json; charset=utf-8" `
+          -Headers @{
+            Authorization = "token $env:SWA_CLI_DEPLOYMENT_TOKEN"
+          }
+        $url = $info.response.siteUrl
+        Write-Host "✅ Deployment URL from api: $url"
+        Add-Content -Path $env:GITHUB_OUTPUT -Value "deployment_url=$url"
+      } catch {
+        Write-Host "❔ Unable to get deployment URL from undocumented API. $_"
+      }
     }
     Write-Host "🎉 Deployment completed successfully! 🎉"
+    exit 0
   } catch {
     Write-Host "::error title=Deployment failed::An error occurred during deployment ❌: $_"
     exit 5

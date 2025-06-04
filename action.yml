@@ -39,6 +39,11 @@ inputs:
     required: false
     default: ''
 
+outputs:
+  deployment_url:
+    description: "The original URL of the Azure Static Web App"
+    value: ${{ steps.swa.outputs.deployment_url }}
+
 runs:
   using: "composite"
   steps:
@@ -75,6 +80,7 @@ runs:
         Write-Host: "::notice title=Federated credentials preferred::You are using a token provided as input, but using federated credentials is preferred for security reasons."
         
     - name: 🚀 Deploy to Azure Static Web Apps
+      id: swa_deploy
       shell: pwsh
       run: |
         ${{ github.action_path }}\deploy.ps1 `
