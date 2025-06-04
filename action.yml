@@ -25,15 +25,15 @@ inputs:
   app_location:
     description: The location of the app to deploy, relative to the root of the repository
     required: false
-    default: '.'
+    default: './'
   api_location:
     description: The location of the API to deploy, relative to the root of the repository
     required: false
-    default: 'api'
+    default: ''
   output_location:
     description: The location where the app is built, relative to the root of the repository
     required: false
-    default: '.'
+    default: './'
   swa_environment:
     description: The environment to deploy to.
     required: false
@@ -87,9 +87,8 @@ runs:
     - name: 🚀 Deploy to Azure Static Web Apps
       shell: pwsh
       run: |
-        if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
-          Write-Host "::error title=SWA CLI not found::Please ensure SWA CLI is installed."
-          exit 1
-        }
-        swa deploy --app-location ${{ inputs.app_location }} --api-location ${{ inputs.api_location }} --output-location ${{ inputs.output_location }} --env ${{ inputs.swa_environment }}
-        Write-Host "Deployment completed successfully."
+        ${{ github.action_path }}\deploy.ps1 `
+          -AppLocation '${{ inputs.app_location }}' `
+          -Environment '${{ inputs.swa_environment }}' `
+          -ApiLocation '${{ inputs.api_location }}' `
+
