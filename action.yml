@@ -1,0 +1,95 @@
+name: Azure Static Web Apps Deploy (small)
+author: Stephan van Rooij
+description: Deploy to Azure Static Web Apps using the SWA CLI, this does not utilize the official Azure Static Web Apps Action. It is a lightweight alternative that uses the SWA CLI directly.
+branding:
+  icon: "upload-cloud"
+  color: "blue"
+inputs:
+  tenant_id:
+    description: The Azure tenant ID
+    required: false
+    default: ''
+  client_id:
+    description: The Azure client ID
+    required: false
+    default: ''
+  static_web_app_name:
+    description: The name of the Azure Static Web App
+    required: false
+    default: ''
+  azure_static_web_apps_api_token:
+    description: The API token for Azure Static Web Apps, this is required if you are not using the federated identity
+    required: false
+    default: ''
+  
+  app_location:
+    description: The location of the app to deploy, relative to the root of the repository
+    required: false
+    default: '.'
+  api_location:
+    description: The location of the API to deploy, relative to the root of the repository
+    required: false
+    default: 'api'
+  output_location:
+    description: The location where the app is built, relative to the root of the repository
+    required: false
+    default: '.'
+  swa_environment:
+    description: The environment to deploy to.
+    required: false
+    default: 'production'
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🧪 Check inputs
+      shell: pwsh
+      if: (inputs.static_web_app_name == '' || inputs.client_id == '' || inputs.tenant_id == '') && inputs.azure_static_web_apps_api_token == ''
+      run: |
+        Write-Host "::error title=Missing inputs::You must either provide the static_web_app_name, client_id and tenant_id, or azure_static_web_apps_api_token input."
+        Write-Host "❌ Missing inputs, check Readme for more information."
+        exit 1
+    - name: 🔑 Sign in to Entra ID
+      if: inputs.tenant_id != '' && inputs.client_id != ''
+      uses: azure/login@v2
+      with:
+        client-id: ${{ inputs.client_id }}
+        tenant-id: ${{ inputs.tenant_id }}
+        allow-no-subscriptions: false
+    - name: 🔑 Load deployment token
+      if: inputs.tenant_id != '' && inputs.client_id != '' && inputs.static_web_app_name != ''
+      shell: pwsh
+      run: |
+        $secretInfo = (az staticwebapp appsettings list --name ${{ inputs.static_web_app_name }}) | ConvertFrom-Json
+        $apiToken = $($secretInfo.properties.apiKey)
+        Add-Content -Path $env:GITHUB_ENV -Value "SWA_CLI_DEPLOYMENT_TOKEN=$apiToken"
+        Write-Host "::add-mask::$apiToken"
+
+    - name: 🔑 Set token from input
+      if: inputs.azure_static_web_apps_api_token != ''
+      shell: pwsh
+      run: |
+        $apiToken = "${{ inputs.azure_static_web_apps_api_token }}"
+        Add-Content -Path $env:GITHUB_ENV -Value "SWA_CLI_DEPLOYMENT_TOKEN=$apiToken"
+        Write-Host "::add-mask::$apiToken"
+        Write-Host: "::notice title=Federated credentials preferred::You are using a token provided as input, but using federated credentials is preferred for security reasons."
+    
+    - name: 📃 Install SWA CLI
+      shell: pwsh
+      run: |
+        if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
+          Write-Host "Installing SWA CLI..."
+          npm install -g @azure/static-web-apps-cli@2.0.6
+        } else {
+          Write-Host "SWA CLI is already installed."
+        }
+    
+    - name: 🚀 Deploy to Azure Static Web Apps
+      shell: pwsh
+      run: |
+        if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
+          Write-Host "::error title=SWA CLI not found::Please ensure SWA CLI is installed."
+          exit 1
+        }
+        swa deploy --app-location ${{ inputs.app_location }} --api-location ${{ inputs.api_location }} --output-location ${{ inputs.output_location }} --env ${{ inputs.swa_environment }}
+        Write-Host "Deployment completed successfully."
