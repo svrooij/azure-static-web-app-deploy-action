@@ -29,7 +29,7 @@ BEGIN {
 
   if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
     Write-Host "📃 Installing SWA CLI @azure/static-web-apps-cli@2.0.6..."
-    npm install -g @azure/static-web-apps-cli@2.0.6
+    Invoke-Expression "npm install -g @azure/static-web-apps-cli@2.0.6"
   }
 
   if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
@@ -38,7 +38,6 @@ BEGIN {
   }
 
   # Build the SWA CLI command parameters
-  Write-Host "✅ Creating SWA CLI command parameters..."
   $cliParameters = @{
     # app_location = $AppLocation
     # output_location = $OutputLocation
@@ -63,25 +62,19 @@ BEGIN {
     $swaCommand += " --$key $($cliParameters[$key])"
   }
 
-  Write-Host "🧑‍💻 Complete command: $swaCommand"
+  
   # Execute the SWA CLI command
   try {
     # capture the output of the command, and extract the url from this output
     # - Preparing deployment. Please wait...
-    # ✔ Project deployed to https://jolly-coast-025d49603.6.azurestaticapps.net 🚀
-    Write-Host "🚀 Deploying static web app..."
+    # ✔ Project deployed to https://fake-name-02abcdef.6.azurestaticapps.net 🚀
+    Write-Host "🚀 Starting deployment in 3..2..1.."
+    Write-Host "🧑‍💻 Executing: $swaCommand"
     
+    # This should execute the command and capture the swaOutput in $output variable
+    Invoke-Expression $swaCommand | Tee-Object -Variable swaOutput
     
-    if ($IsDebug) {
-      Write-Host "📜 Command output -----------------------------"
-      Invoke-Expression $swaCommand
-      Write-Host "📜 Command output end--------------------------"
-    } else {
-      $output = Invoke-Expression $swaCommand 2>&1
-    }
-    # It seems it does not capture the output correctly...
-    Write-Host "📦 Deployment output:`n$output"
-    if ($output -match "Project deployed to (https?://[^\s]+)") {
+    if ($swaOutput -match "Project deployed to (https?://[^\s]+)") {
       $url = $matches[1]
       Write-Host "✅ Deployment URL: $url"
       Write-Host "::set-output name=deployment-url::$url"
