@@ -30,10 +30,6 @@ inputs:
     description: The location of the API to deploy, relative to the root of the repository
     required: false
     default: ''
-  output_location:
-    description: The location where the app is built, relative to the root of the repository
-    required: false
-    default: './'
   swa_environment:
     description: The environment to deploy to.
     required: false
@@ -77,17 +73,7 @@ runs:
         Add-Content -Path $env:GITHUB_ENV -Value "SWA_CLI_DEPLOYMENT_TOKEN=$apiToken"
         Write-Host "::add-mask::$apiToken"
         Write-Host: "::notice title=Federated credentials preferred::You are using a token provided as input, but using federated credentials is preferred for security reasons."
-    
-    - name: 📃 Install SWA CLI
-      shell: pwsh
-      run: |
-        if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
-          Write-Host "Installing SWA CLI..."
-          npm install -g @azure/static-web-apps-cli@2.0.6
-        } else {
-          Write-Host "SWA CLI is already installed."
-        }
-    
+        
     - name: 🚀 Deploy to Azure Static Web Apps
       shell: pwsh
       run: |
@@ -96,4 +82,4 @@ runs:
           -Environment '${{ inputs.swa_environment }}' `
           -ApiLocation '${{ inputs.api_location }}' `
           -ConfigDirectory '${{ inputs.swa_config_directory }}' `
-
+          -IsDebug ('${{runner.debug}}' -eq '1')
