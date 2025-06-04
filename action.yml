@@ -60,7 +60,7 @@ runs:
       if: inputs.tenant_id != '' && inputs.client_id != '' && inputs.static_web_app_name != ''
       shell: pwsh
       run: |
-        $secretInfo = (az staticwebapp appsettings list --name ${{ inputs.static_web_app_name }}) | ConvertFrom-Json
+        $secretInfo = (az staticwebapp secrets list --name ${{ inputs.static_web_app_name }}) | ConvertFrom-Json
         $apiToken = $($secretInfo.properties.apiKey)
         Add-Content -Path $env:GITHUB_ENV -Value "SWA_CLI_DEPLOYMENT_TOKEN=$apiToken"
         Write-Host "::add-mask::$apiToken"
