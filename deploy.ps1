@@ -17,11 +17,6 @@ BEGIN {
   $ErrorActionPreference = "Stop"
   $PSDefaultParameterValues["*:ErrorAction"] = "Stop"
 
-  if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
-    Write-Host "::error title=SWA CLI not found::Static web apps CLI could not be installed."
-    exit 1
-  }
-
   if (-not (Test-Path $AppLocation)) {
     Write-Host "::error title=App Location not found::The specified app location '$AppLocation' does not exist."
     exit 1
@@ -35,6 +30,11 @@ BEGIN {
   if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
     Write-Host "📃 Installing SWA CLI @azure/static-web-apps-cli@2.0.6..."
     npm install -g @azure/static-web-apps-cli@2.0.6
+  }
+
+  if (-not (Get-Command swa -ErrorAction SilentlyContinue)) {
+    Write-Host "::error title=SWA CLI not found::Static web apps CLI could not be installed."
+    exit 1
   }
 
   # Build the SWA CLI command parameters
