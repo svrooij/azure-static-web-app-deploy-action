@@ -14,7 +14,7 @@ No official [Azure Static Web Apps Action](https://github.com/marketplace/action
 
 ```yaml
 - name: Deploy to Azure Static Web Apps
-  uses: svrooij/azure-static-web-app-deploy-action@v1
+  uses: svrooij/azure-static-web-app-deploy-action@main
   with:
     tenant_id: ${{ secrets.AZURE_TENANT_ID }}                # Required for federated credentials
     client_id: ${{ secrets.AZURE_CLIENT_ID }}                #Required for federated credentials
@@ -29,7 +29,7 @@ No official [Azure Static Web Apps Action](https://github.com/marketplace/action
 
 ```yaml
 - name: Deploy to Azure Static Web Apps
-  uses: svrooij/azure-static-web-app-deploy-action@v1
+  uses: svrooij/azure-static-web-app-deploy-action@main
   with:
     azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }} # Required if not using federated credentials
     app_location: '.'                                        # Optional, default '.'
@@ -76,7 +76,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Deploy to Azure Static Web Apps
-        uses: <your-username>/azure-static-web-app-deploy-action@v1
+        uses: <your-username>/azure-static-web-app-deploy-action@main
         with:
           tenant_id: ${{ secrets.AZURE_TENANT_ID }}
           client_id: ${{ secrets.AZURE_CLIENT_ID }}

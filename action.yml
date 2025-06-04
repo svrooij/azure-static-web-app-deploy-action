@@ -55,7 +55,7 @@ runs:
       with:
         client-id: ${{ inputs.client_id }}
         tenant-id: ${{ inputs.tenant_id }}
-        allow-no-subscriptions: false
+        allow-no-subscriptions: true
     - name: 🔑 Load deployment token
       if: inputs.tenant_id != '' && inputs.client_id != '' && inputs.static_web_app_name != ''
       shell: pwsh
