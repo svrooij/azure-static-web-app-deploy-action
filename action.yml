@@ -1,6 +1,6 @@
 name: Azure Static Web Apps Deploy (small)
 author: Stephan van Rooij
-description: Deploy to Azure Static Web Apps using the SWA CLI, this does not utilize the official Azure Static Web Apps Action. It is a lightweight alternative that uses the SWA CLI directly.
+description: Deploy to Azure Static Web Apps using the SWA CLI (lightweight)
 branding:
   icon: "upload-cloud"
   color: "blue"

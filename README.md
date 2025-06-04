@@ -1,7 +1,7 @@
 # 🚀 Azure Static Web Apps Deploy (Small)
 
-A lightweight GitHub Action to deploy your Azure Static Web App using the SWA CLI, without downloading a 1.5 GB Docker image every time!  
-No official Azure Static Web Apps Action required.
+A lightweight GitHub Action to deploy your Azure Static Web App using the [SWA CLI](https://azure.github.io/static-web-apps-cli/docs/cli/swa-deploy), without downloading a 1.5 GB Docker image every time!  
+No official [Azure Static Web Apps Action](https://github.com/marketplace/actions/azure-static-web-apps-deploy) required.
 
 ## ✨ Features
 
