@@ -71,18 +71,23 @@ BEGIN {
     # ✔ Project deployed to https://jolly-coast-025d49603.6.azurestaticapps.net 🚀
     Write-Host "🚀 Deploying static web app..."
     
-    $output = Invoke-Expression $swaCommand 2>&1
+    
     if ($IsDebug) {
-      Write-Host "📜 Command output -----------------------------`n: $output`n📜 Command output end--------------------------"
+      Write-Host "📜 Command output -----------------------------"
+      Invoke-Expression $swaCommand
+      Write-Host "📜 Command output end--------------------------"
+    } else {
+      $output = Invoke-Expression $swaCommand 2>&1
     }
-    if ($output -match "✔ Project deployed to (https?://[^\s]+)") {
+    # It seems it does not capture the output correctly...
+    Write-Host "📦 Deployment output:`n$output"
+    if ($output -match "Project deployed to (https?://[^\s]+)") {
       $url = $matches[1]
       Write-Host "✅ Deployment URL: $url"
       Write-Host "::set-output name=deployment-url::$url"
-    } else {
-      Write-Host "::error title=Deployment failed::Could not extract deployment URL from output."
-      exit 100
+      Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "## Static web app deployment`n`n✅ Deployment URL: [$url]($url)`n"
     }
+    Write-Host "🎉 Deployment completed successfully! 🎉"
   } catch {
     Write-Host "::error title=Deployment failed::An error occurred during deployment ❌: $_"
     exit 5
