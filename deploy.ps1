@@ -62,7 +62,6 @@ BEGIN {
     $swaCommand += " --$key $($cliParameters[$key])"
   }
 
-  
   # Execute the SWA CLI command
   try {
     # capture the output of the command, and extract the url from this output
@@ -79,6 +78,10 @@ BEGIN {
       Write-Host "✅ Deployment URL: $url"
       Write-Host "::set-output name=deployment-url::$url"
       Add-Content -Path $env:GITHUB_STEP_SUMMARY -Value "## Static web app deployment`n`n✅ Deployment URL: [$url]($url)`n"
+    } else {
+      Write-Host "❔ Deployment URL not found, output did not capture everything.-----------------------------"
+      Write-Host $swaOutput
+      Write-Host "❔ Deployment URL not found, output did not capture everything.-----------------------------"
     }
     Write-Host "🎉 Deployment completed successfully! 🎉"
   } catch {
